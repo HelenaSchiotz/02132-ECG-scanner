@@ -23,17 +23,18 @@ int main()
     for(int i = 0; i < 2; i++){ //Set all indices to 0
         filteredDataArray[i] = 0;
     }
+
     for(int i = 0; i < 35; i++){
 		int data = getNextData(file);          // Read Data from Sensor
 
 		int LPF = lowPassFilter(data,unfilteredDataArray,filteredDataArray);  // Filter Data with lowpass
 		int HPF = highPassFilter(LPF,unfilteredDataArray,filteredDataArray);
-		int D = derivative(HPF,unfilteredDataArray);
-		int sq = squaring(D);
-		int mw = MWI(sq,unfilteredDataArray);
-
+		//int D = derivative(HPF,unfilteredDataArray);
+		//int sq = squaring(D);
+		//int mw = MWI(sq,unfilteredDataArray);
+		printf("%i\n",HPF);
 		shuffleArray(unfilteredDataArray, 32, data);
-		shuffleArray(filteredDataArray,2 , mw);
+		shuffleArray(filteredDataArray,2 , LPF);
     }
     //peakDetection(&qsr_params); // Perform Peak Detection
 
