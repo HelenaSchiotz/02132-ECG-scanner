@@ -4,12 +4,13 @@
 
 int getNextData(FILE *file)
 {
-   return 0; // return sensor value
+	int value = 1;
+	fscanf(file, "%d",&value);
+	return value; // return sensor value
 }
 
 FILE* openfile(const char* filename)
 {
-   FILE *file = NULL; // Replace NULL with the actual file object
-
+   FILE *file = fopen(filename,"r"); // Replace NULL with the actual file object
    return file;
 }
