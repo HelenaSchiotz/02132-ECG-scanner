@@ -2,15 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int getNextData(FILE *file) {
-	int value;
-	fscanf(file,"%i",&value);
-	printf("%d", "test");
+int getNextData(FILE *file)
+{
+	int value = 1;
+	fscanf(file, "%d",&value);
 	return value; // return sensor value
 }
 
-FILE* openfile(const char* filename) {
-	FILE *file = filename; // Replace NULL with the actual file object
-	return file;
+FILE* openfile(const char* filename)
+{
+   FILE *file = fopen(filename,"r"); // Replace NULL with the actual file object
+   return file;
 }
-
