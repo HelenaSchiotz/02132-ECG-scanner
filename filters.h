@@ -5,5 +5,5 @@
 void lowPassFilter();
 
 // Implement additional filters
- 
+
 #endif // FILTERS_H
