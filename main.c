@@ -42,5 +42,6 @@ int main()
 
 
 int* shuffleArray(int* array, int arrayCount, newData){
+
 	return 0;
 }
