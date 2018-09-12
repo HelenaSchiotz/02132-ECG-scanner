@@ -24,16 +24,16 @@ int main()
         filteredDataArray[i] = 0;
     }
     for(int i = 0; i < 35; i++){
-    int data = getNextData(file);          // Read Data from Sensor
+		int data = getNextData(file);          // Read Data from Sensor
 
-    int LPF = lowPassFilter(data,unfilteredDataArray,filteredDataArray);  // Filter Data with lowpass
-    int HPF = highPassFilter(LPF,unfilteredDataArray,filteredDataArray);
-    int D = derivative(HPF,unfilteredDataArray);
-    int sq = squaring(D);
-    int mw = MWI(sq,unfilteredDataArray);
+		int LPF = lowPassFilter(data,unfilteredDataArray,filteredDataArray);  // Filter Data with lowpass
+		int HPF = highPassFilter(LPF,unfilteredDataArray,filteredDataArray);
+		int D = derivative(HPF,unfilteredDataArray);
+		int sq = squaring(D);
+		int mw = MWI(sq,unfilteredDataArray);
 
-    unfilteredDataArray = shuffleArray(unfilteredDataArray, 32, data);
-    filteredDataArray = shuffleArray(filteredDataArray,2 , mw);
+		shuffleArray(unfilteredDataArray, 32, data);
+		shuffleArray(filteredDataArray,2 , mw);
     }
     //peakDetection(&qsr_params); // Perform Peak Detection
 
@@ -41,6 +41,11 @@ int main()
 }
 
 
-int* shuffleArray(int* array, int arrayCount, newData){
-	return 0;
+void shuffleArray(int* array, int arrayCount, int newData){
+	int pH;
+	for (int i = arrayCount-1; i > 0; i--) {
+		pH = array[i - 1];
+		array[i] = pH;
+	}
+	array[0] = newData;
 }
