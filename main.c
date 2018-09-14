@@ -13,28 +13,33 @@ int main()
     QRS_params qsr_params;       // Instance of the made avaiable through: #include "qsr.h"
 	FILE *file;                  // Pointer to a file object
 	file = openfile("ECG.txt");	//Open file ECG.txt
-    int* unfilteredDataArray = malloc(32*sizeof(int)); //Declare int array with 32 ints
-    int* filteredDataArray = malloc(2*sizeof(int)); //Declare int array with 2 ints
+	int arraySize = 33;
+    int* rawDataArray = malloc(arraySize*sizeof(int)); //Declare int array with 32 ints
+    int* LPFDataArray = malloc(arraySize*sizeof(int));
+    int* HPFDataArray = malloc(arraySize*sizeof(int));
+    int* derivativeArray = malloc(arraySize*sizeof(int));
+    int* squareArray = malloc(arraySize*sizeof(int));
+    int* MWIArray = malloc(arraySize*sizeof(int));
 
 
-    for(int i = 0; i < 32; i++){ //Set all indices to 0
-    	unfilteredDataArray[i] = 0;
-    }
-    for(int i = 0; i < 2; i++){ //Set all indices to 0
-        filteredDataArray[i] = 0;
+
+    for(int i = 0; i < arraySize; i++){ //Set all indices to 0
+    	rawDataArray[i] = 0;
+    	LPFDataArray[i] = 0;
+    	HPFDataArray[i] = 0;
+    	derivativeArray[i] = 0;
+    	squareArray[i] = 0;
+    	MWIArray[i] = 0;
     }
 
     for(int i = 0; i < 35; i++){
-		int data = getNextData(file);          // Read Data from Sensor
+		shuffleArray(rawDataArray,arraySize ,getNextData(file));
+		shuffleArray(LPFDataArray, arraySize, lowPassFilter(rawDataArray,LPFDataArray));
+		shuffleArray(HPFDataArray,arraySize,highPassFilter(LPFDataArray,HPFDataArray));
+		shuffleArray(derivativeArray,arraySize,derivative(HPFDataArray));
+		shuffleArray(squareArray,arraySize,squaring(derivativeArray[0]));
+		shuffleArray(MWIArray,arraySize,MWI(squareArray));
 
-		int LPF = lowPassFilter(data,unfilteredDataArray,filteredDataArray);  // Filter Data with lowpass
-		int HPF = highPassFilter(LPF,unfilteredDataArray,filteredDataArray);
-		//int D = derivative(HPF,unfilteredDataArray);
-		//int sq = squaring(D);
-		//int mw = MWI(sq,unfilteredDataArray);
-		printf("%i\n",HPF);
-		shuffleArray(unfilteredDataArray, 32, data);
-		shuffleArray(filteredDataArray,2 , LPF);
     }
     //peakDetection(&qsr_params); // Perform Peak Detection
 
