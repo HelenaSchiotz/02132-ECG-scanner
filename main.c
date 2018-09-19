@@ -8,20 +8,42 @@
 // The functions and object predefined are just for inspiration.
 // Please change orden,names arguments to fit your solution.
 
-int main()
-{	
-    QRS_params qsr_params;       // Instance of the made avaiable through: #include "qsr.h"
+int main() {
+	printf("Start \n");
 	FILE *file;                  // Pointer to a file object
 	file = openfile("ECG.txt");	//Open file ECG.txt
-	int arraySize = 33;
+	int arraySize = 10000;
     int* rawDataArray = malloc(arraySize*sizeof(int)); //Declare int array with 32 ints
     int* LPFDataArray = malloc(arraySize*sizeof(int));
     int* HPFDataArray = malloc(arraySize*sizeof(int));
     int* derivativeArray = malloc(arraySize*sizeof(int));
     int* squareArray = malloc(arraySize*sizeof(int));
     int* MWIArray = malloc(arraySize*sizeof(int));
+    int* peaks = malloc(1000*sizeof(int));
 
+    //Initializing params and its variables
+    QRS_params *params;
+    params->Rpeak = 0;
+    params->SPKF = 0;
+	params->NPKF = 0;
+	params->THRESHOLD1 = 0;
+	params->THRESHOLD2 = 0;
+	params->RR_Average1 = 0;
+	params->RR_Average2 = 0;
+	params->RR_LOW = 0;
+	params->RR_HIGH = 0;
+	params->RR_MISS = 0;
+	params->RecentRR_OK = malloc(8*sizeof(int));
+	params->RecentRR = malloc(8*sizeof(int));
+	params->RR = 0;
+	params->peak = 0;
+	params->SincePeak = 0;
+	params->count = 0;
 
+	for (int i = 0; i < 8; i++) {
+		params->RecentRR_OK[i] = 150;
+		params->RecentRR[i] = 150;
+	}
 
     for(int i = 0; i < arraySize; i++){ //Set all indices to 0
     	rawDataArray[i] = 0;
@@ -30,18 +52,25 @@ int main()
     	derivativeArray[i] = 0;
     	squareArray[i] = 0;
     	MWIArray[i] = 0;
+    	peaks[i] = 0;
     }
-
-    for(int i = 0; i < 35; i++){
+    printf("Before peak \n");
+    for(int i = 0; i < arraySize; i++){
 		shuffleArray(rawDataArray,arraySize ,getNextData(file));
 		shuffleArray(LPFDataArray, arraySize, lowPassFilter(rawDataArray,LPFDataArray));
+		//printf("LPF %i \n", LPFDataArray[0]);
 		shuffleArray(HPFDataArray,arraySize,highPassFilter(LPFDataArray,HPFDataArray));
+		//printf("HPF %i \n", HPFDataArray[0]);
 		shuffleArray(derivativeArray,arraySize,derivative(HPFDataArray));
+		//printf("DER %i \n", derivativeArray[0]);
 		shuffleArray(squareArray,arraySize,squaring(derivativeArray[0]));
+		//printf("sqr %i \n", squareArray[0]);
 		shuffleArray(MWIArray,arraySize,MWI(squareArray));
-
+		//printf("MWI %i \n", MWIArray[0]);
+	    int p = peakDetection(MWIArray, peaks, params); // Perform Peak Detection
+	    //printf("%i \n", MWIArray[0]);
+	    //printf("peak %i, RR %i, Average1 %i, threshold1 %i  \n", params->peak, params->RR, params->RR_Average1,params->THRESHOLD1);
     }
-    //peakDetection(&qsr_params); // Perform Peak Detection
 
 	return 0;
 }

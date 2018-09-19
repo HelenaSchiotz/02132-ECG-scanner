@@ -22,7 +22,7 @@ int squaring(int data){
 
 int MWI(int* unfilteredArray){
 	int sum = 0;
-	for(int i = 0; i < 33; i++){
+	for(int i = 0; i < 30; i++){
 		sum += unfilteredArray[i];
 	}
 	return sum/30;
