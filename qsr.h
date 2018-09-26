@@ -23,6 +23,8 @@ typedef struct QRS_params
    int peak;
    int SincePeak;
    int count;
+   int missed;
+   int* RecentRR_RR;
    
 } QRS_params;
 

@@ -27,21 +27,24 @@ int main() {
 	params->NPKF = 0;
 	params->THRESHOLD1 = 5000;
 	params->THRESHOLD2 = 600;
-	params->RR_Average1 = 150;
+	params->RR_Average1 = 0;
 	params->RR_Average2 = 0;
-	params->RR_LOW = 100;
-	params->RR_HIGH = 200;
-	params->RR_MISS = 250;
+	params->RR_LOW = 110;
+	params->RR_HIGH = 180;
+	params->RR_MISS = 200;
 	params->RecentRR_OK = malloc(8*sizeof(int));
 	params->RecentRR = malloc(8*sizeof(int));
 	params->RR = 0;
 	params->peak = 0;
 	params->SincePeak = 0;
-	params->count = 0;
+	params->count = -1;
+	params->missed = 0;
+	params->RecentRR_RR = malloc(arraySize*sizeof(int));
+
 
 	for (int i = 0; i < 8; i++) {
-		params->RecentRR_OK[i] = 147;
-		params->RecentRR[i] = 150;
+		params->RecentRR_OK[i] = 140;
+		params->RecentRR[i] = 100;
 	}
 
     for(int i = 0; i < arraySize; i++){ //Set all indices to 0
@@ -52,6 +55,7 @@ int main() {
     	squareArray[i] = 0;
     	MWIArray[i] = 0;
     	peaks[i] = 0;
+    	params->RecentRR_RR[i] = 0;
     }
 
     for(int i = 0; i < arraySize; i++){
@@ -61,9 +65,11 @@ int main() {
 		shuffleArray(derivativeArray,arraySize,derivative(HPFDataArray));
 		shuffleArray(squareArray,arraySize,squaring(derivativeArray[0]));
 		shuffleArray(MWIArray,arraySize,MWI(squareArray));
+		//printf("%i\n",MWIArray[0]);
 	    int p = peakDetection(MWIArray, peaks, params); // Perform Peak Detection
 	    //printf("peak %i, RR %i, Average1 %i, threshold1 %i  \n", params->peak, params->RR, params->RR_Average1,params->THRESHOLD1);
     }
+
 
 	return 0;
 }
