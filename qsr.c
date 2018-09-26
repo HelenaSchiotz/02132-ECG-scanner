@@ -78,6 +78,8 @@ int peakDetection(int* MWI, int* peaks, QRS_params *params) {
 			//printf("TH1: %i \n", params->THRESHOLD1);
 		}
 	}
+
+	//do NOT TOUCH
 	if (params->missed >= 5) {
 		//printf("Heart failure \n");
 	} else {
