@@ -22,7 +22,7 @@ int peakDetection(int* MWI, int* peaks, QRS_params *params) {
 				params->SincePeak = 0;
 				shuffleArray(params->RecentRR_OK, 8, params->RR);
 				shuffleArray(params->RecentRR, 8, params->RR);
-				shuffleArray(params->RecentRR_RR, 8, params->RR);
+				shuffleArray(params->RecentRR_RR, 10000, params->RR);
 
 
 				params->RR_Average2 = average(params->RecentRR_OK);

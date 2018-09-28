@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 // Main function for organizing the program execution.
 // The functions and object predefined are just for inspiration.
 // Please change orden,names arguments to fit your solution.
@@ -13,7 +12,7 @@ int main() {
 	FILE *file;                  // Pointer to a file object
 	file = openfile("ECG.txt");	//Open file ECG.txt
 	int arraySize = 10000;
-    int* rawDataArray = malloc(arraySize*sizeof(int)); //Declare int array with 32 ints
+    int* rawDataArray = malloc(arraySize*sizeof(int));
     int* LPFDataArray = malloc(arraySize*sizeof(int));
     int* HPFDataArray = malloc(arraySize*sizeof(int));
     int* derivativeArray = malloc(arraySize*sizeof(int));
@@ -38,10 +37,9 @@ int main() {
 	params->RR = 0;
 	params->peak = 0;
 	params->SincePeak = 0;
-	params->count = -1;
+	params->count = 0;
 	params->missed = 0;
 	params->RecentRR_RR = malloc(arraySize*sizeof(int));
-
 
 	for (int i = 0; i < 8; i++) {
 		params->RecentRR_OK[i] = 140;
