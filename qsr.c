@@ -1,19 +1,20 @@
 #include "qsr.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 int peakDetection(int* MWI, int* peaks, QRS_params *params) {
-
+	clock_t start, end;
+	double cpu_time_used;
+	start = clock();
 
 	if ((MWI[0] <= MWI[1]) && (MWI[1] <= MWI[2]) && (MWI[2] >= MWI[3]) && (MWI[3] >= MWI[4]) && !(MWI[0] == MWI[1] ==MWI[2] == MWI[3] == MWI[4])) {
 		params->peak = MWI[2];
 		shuffleArray(params->RecentRR_RR, 10000, params->count);
 		shuffleArray(peaks, 10000, params->peak);
-		//printf("%i \n", params->peak);
 		if (params->peak > params->THRESHOLD1) {
 			params->RR = params->SincePeak;
 
-			//printf("RR: %i \n", params->RR);
 
 			if ((params->RR_LOW < params->RR) && (params->RR < params->RR_HIGH)) {
 				params->Rpeak = params->peak;
@@ -33,18 +34,29 @@ int peakDetection(int* MWI, int* peaks, QRS_params *params) {
 				params->THRESHOLD1 = (int) (params->NPKF  + (0.25*(params->SPKF-params->NPKF)));
 				params->THRESHOLD2 = (int) (0.5*params->THRESHOLD1);
 				params->missed = 0;
-				//printf("Count: %i, A1: %i, Peak: %i, NPKF: %i, SPKF: %i, LOW: %i, HIGH: %i, MISS: %i, T1: %i, T2: %i\n",params->count,params->RR_Average1, params->Rpeak, params->NPKF, params->SPKF, params->RR_LOW, params->RR_HIGH, params->RR_MISS, params->THRESHOLD1, params->THRESHOLD2);
-				printf("%i %i \n", params->count, params->Rpeak);
+				printf("Peak: %-6i Time: %-6i Pulse: %-6i ", params->Rpeak, params->count, ((params->RR*60)/250));
+				if (params->missed >= 5) {
+					printf("Status: Heart failure! \n");
+				} else if (params->Rpeak < 2000) {
+					printf("Status: Weak Heartbeat! \n");
+				} else {
+					printf("Status: All is fine \n");
+				}
 
 			} else {
 				params->missed++;
-				//printf("COUNT:%i  LOW:%i  RR:%i  HIGH:%i  MISS:%i \n",params->count, params->RR_LOW, params->RR, params->RR_HIGH, params->RR_MISS);
 				if (params->RR >= params->RR_MISS) {
 					int peak2 = searchback(peaks, params->RecentRR_RR, params->THRESHOLD2);
-					//printf("SB: %i, %i \n", peak2, peaks[peak2 - 1]);
 					shuffleArray(params->RecentRR, 8, params->count-peak2);
-					printf("%i %i \n", peak2, MWI[params->count-peak2+2]);
+					printf("Peak: %-6i Time: %-6i Pulse: %-6i ", MWI[params->count-peak2+2], peak2, (((params->count-peak2)*60)/250));
 					params->SPKF = (int) ((0.25*MWI[params->count-peak2+2]) +  (0.75*params->SPKF));
+					if (params->missed >= 5) {
+						printf("Status: Heart failure! \n");
+					} else if (params->Rpeak < 2000) {
+						printf("Status: Weak Heartbeat! \n");
+					} else {
+						printf("Status: All is fine \n");
+					}
 					params->RR_Average1 = average(params->RecentRR);
 					params->RR_LOW = (int) (0.92*params->RR_Average1);
 					params->RR_HIGH = (int)  (1.16*params->RR_Average1);
@@ -52,7 +64,6 @@ int peakDetection(int* MWI, int* peaks, QRS_params *params) {
 					params->THRESHOLD1 = (int) (params->NPKF + (0.25*(params->SPKF-params->NPKF)));
 					params->THRESHOLD2 = (int) (0.5*params->THRESHOLD1);
 
-					//params->Rpeak = peak2;
 					params->SPKF = (int) ((0.25*params->Rpeak) +  (0.75*params->SPKF));
 					shuffleArray(params->RecentRR, 8, params->RR);
 					params->RR_Average1 = average(params->RecentRR);
@@ -62,32 +73,33 @@ int peakDetection(int* MWI, int* peaks, QRS_params *params) {
 					params->THRESHOLD1 = (int) (params->NPKF + (0.25*(params->SPKF-params->NPKF)));
 					params->THRESHOLD2 = (int) (0.5*params->THRESHOLD1);
 					params->SincePeak = 0;
-					//printf("Count: %i, A1: %i, Peak: %i, SPKF: %i, LOW: %i, HIGH: %i, MISS: %i, T1: %i, T2: %i\n",params->count, params->RR_Average1, params->Rpeak, params->SPKF, params->RR_LOW, params->RR_HIGH, params->RR_MISS, params->THRESHOLD1, params->THRESHOLD2);
-					//printf("%i %i \n", params->count, params->Rpeak);
-					printf("%i %i  \n", params->count, params->Rpeak);
-					//printf("MISS \n");
+
+					printf("Peak: %-6i Time: %-6i Pulse: %-6i ",params->Rpeak, params->count, (((params->RR-(params->count-peak2))*60)/250));
+					if (params->missed >= 5) {
+						printf("Status: Heart failure! \n");
+					} else if (params->Rpeak < 2000) {
+						printf("Status: Weak Heartbeat! \n");
+					} else {
+						printf("Status: All is fine \n");
+					}
 				}
 
 			}
 
 		} else {
 			params->NPKF = (int) (0.125*params->peak + 0.875*params->NPKF);
-			//printf("NPKF: %i\n", params->NPKF);
 			params->THRESHOLD1 = (int) (params->NPKF + 0.25*(params->SPKF-params->NPKF));
 			params->THRESHOLD2 = (int) (0.5*params->THRESHOLD1);
-			//printf("TH1: %i \n", params->THRESHOLD1);
 		}
 	}
 
-	//do NOT TOUCH
-	if (params->missed >= 5) {
-		//printf("Heart failure \n");
-	} else {
-		//pritnf("");
-	}
-	//printf("%i\n", params->RR_LOW);
+
 	params->SincePeak++;
 	params->count++;
+
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	//printf("Time: %-10f \n", cpu_time_used);
 	return params->Rpeak;
 
 }
@@ -110,4 +122,5 @@ int average(int* array) {
 	}
 	return (int) (sum/8);
 }
+
 
